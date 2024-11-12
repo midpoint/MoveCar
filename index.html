@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知车主挪车</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode.js@1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: #fff;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .notify-btn {
+            background: #28a745;
+        }
+
+        .notify-btn:hover {
+            background: #218838;
+        }
+
+        .call-btn {
+            background: #17a2b8;
+        }
+
+        .call-btn:hover {
+            background: #138496;
+        }
+
+        /* 添加设置相关样式 */
+        .settings-btn {
+            background: #6c757d;
+            margin-top: 20px;
+        }
+
+        .settings-btn:hover {
+            background: #5a6268;
+        }
+
+        .settings-panel {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .save-btn {
+            background: #007bff;
+        }
+
+        .save-btn:hover {
+            background: #0056b3;
+        }
+
+        /* 添加二维码相关样式 */
+        .qrcode-container {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .qrcode-container p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>通知车主挪车</h1>
+        <div id="mainPanel">
+            <p>如需通知车主，请点击以下按钮</p>
+            <button class="notify-btn" onclick="notifyOwner()">通知车主挪车</button>
+            <button class="call-btn" onclick="callOwner()">拨打车主电话</button>
+            <button class="settings-btn" onclick="toggleSettings()">设置</button>
+        </div>
+
+        <div id="settingsPanel" class="settings-panel">
+            <div class="input-group">
+                <label for="phone">手机号码:</label>
+                <input type="tel" id="phone" placeholder="请输入手机号">
+            </div>
+            <div class="input-group">
+                <label for="appToken">WxPusher APP Token:</label>
+                <input type="text" id="appToken" placeholder="请输入 APP Token">
+            </div>
+            <div class="input-group">
+                <label for="uid">WxPusher UID:</label>
+                <input type="text" id="uid" placeholder="请输入 UID">
+            </div>
+            <button class="save-btn" onclick="saveSettings()">保存设置</button>
+        </div>
+
+        <div class="qrcode-container">
+            <p>扫描二维码访问本页面</p>
+            <div id="qrcode"></div>
+        </div>
+    </div>
+
+    <script>
+        // 从 localStorage 获取配置
+        let config = {
+            phone: localStorage.getItem('phone') || '',
+            wxpusherAppToken: localStorage.getItem('wxpusherAppToken') || '',
+            wxpusherUIDs: [localStorage.getItem('wxpusherUID') || '']
+        };
+
+        // 页面加载时填充已保存的设置
+        window.onload = function () {
+            document.getElementById('phone').value = config.phone;
+            document.getElementById('appToken').value = config.wxpusherAppToken;
+            document.getElementById('uid').value = config.wxpusherUIDs[0];
+
+            // 生成二维码
+            const currentUrl = window.location.href;
+            new QRCode(document.getElementById("qrcode"), {
+                text: currentUrl,
+                width: 128,
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        };
+
+        // 切换设置面板显示
+        function toggleSettings() {
+            const settingsPanel = document.getElementById('settingsPanel');
+            settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 保存设置
+        function saveSettings() {
+            config.phone = document.getElementById('phone').value;
+            config.wxpusherAppToken = document.getElementById('appToken').value;
+            config.wxpusherUIDs = [document.getElementById('uid').value];
+
+            // 保存到 localStorage
+            localStorage.setItem('phone', config.phone);
+            localStorage.setItem('wxpusherAppToken', config.wxpusherAppToken);
+            localStorage.setItem('wxpusherUID', config.wxpusherUIDs[0]);
+
+            alert('设置已保存');
+        }
+
+        // 调用 Wxpusher API 来发送挪车通知
+        function notifyOwner() {
+            fetch("https://wxpusher.zjiecode.com/api/send/message", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    appToken: config.wxpusherAppToken,
+                    content: "您好，有人需要您挪车，请及时处理。",
+                    contentType: 1,
+                    uids: config.wxpusherUIDs
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 1000) {
+                        alert("通知已发送！");
+                    } else {
+                        alert("通知发送失败，请稍后重试。");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error sending notification:", error);
+                    alert("通知发送出错，请检查网络连接。");
+                });
+        }
+
+        // 拨打车主电话
+        function callOwner() {
+            window.location.href = "tel:" + config.phone;
+        }
+    </script>
+</body>
+
+</html>
