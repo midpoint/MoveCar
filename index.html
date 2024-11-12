@@ -179,23 +179,30 @@
             wxpusherUIDs: [localStorage.getItem('wxpusherUID') || '']
         };
 
-        // 页面加载时填充已保存的设置
-        window.onload = function () {
+        // 将 window.onload 函数单独处理
+        window.addEventListener('load', function () {
+            // 填充设置
             document.getElementById('phone').value = config.phone;
             document.getElementById('appToken').value = config.wxpusherAppToken;
             document.getElementById('uid').value = config.wxpusherUIDs[0];
 
             // 生成二维码
-            const currentUrl = window.location.href;
-            new QRCode(document.getElementById("qrcode"), {
-                text: currentUrl,
-                width: 128,
-                height: 128,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        };
+            try {
+                const currentUrl = window.location.href;
+                console.log('Current URL:', currentUrl); // 调试用
+
+                new QRCode(document.getElementById("qrcode"), {
+                    text: currentUrl,
+                    width: 128,
+                    height: 128,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (error) {
+                console.error('QR Code generation error:', error); // 调试用
+            }
+        });
 
         // 切换设置面板显示
         function toggleSettings() {
