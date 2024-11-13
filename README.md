@@ -1,3 +1,3 @@
 # MoveCar
 
-自定义挪车码，开发中……
+自定义挪车码，可以放到 cloudflare workers pages 中使用
