@@ -56,7 +56,7 @@ async function handleRequest(request) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>通知车主挪车</title>
-        <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
+        </script" target="_blank" class="textToLink">https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script</a>>
         <style>
           * { box-sizing: border-box; margin: 0; padding: 0; }
           body { font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5; color: #333; }
